@@ -1,0 +1,170 @@
+version: "3.9"
+volumes:
+    readsb-config:
+    readsb-run:
+    adsbexchange-feed:
+services:
+    readsb:
+        build: ./readsb
+        image: readsb
+        restart: always
+        environment:
+            - LAT
+            - LON
+        devices:
+            - /dev/bus/usb
+        expose:
+            - 30001
+            - 30002
+            - 30003
+            - 30004
+            - 30005
+            - 30102
+            - 30104
+            - 30105
+            - 30106
+        ports:
+            - 30001:30001
+            - 30002:30002
+            - 30003:30003
+            - 30004:30004
+            - 30005:30005
+            - 30102:30102
+            - 30104:30104
+            - 30105:30105
+            - 30106:30106
+        volumes:
+            - readsb-run:/run/readsb/
+            #- readsb-config:/etc/default/
+            - type: volume
+              source: readsb-config
+              target: /etc/default/
+              volume:
+                nocopy: false
+            
+    # readsb-autogain:
+    #     build: ./readsb-autogain
+    #     image: readsb-autogain
+    #     restart: always
+    #     volumes:
+    #         - readsb-run:/run/readsb/
+    #         - readsb-config:/etc/default/
+
+    adsbexchange-feed:
+        build: ./adsbexchange-feed
+        image: adsbexchange-feed
+        restart: always
+        depends_on:
+            - readsb
+        environment:
+            - LAT
+            - LON
+            - ADSB_EXCHANGE_UUID
+            - RECEIVER_HOST=readsb
+            - RECEIVER_PORT=30005
+        volumes:
+            - adsbexchange-feed:/run/adsbexchange-feed
+
+    adsbexchange-mlat:
+        build: ./adsbexchange-mlat
+        image: adsbexchange-mlat
+        restart: always
+        depends_on:
+            - readsb
+            - adsbexchange-feed
+        environment:
+            - LAT
+            - LON
+            - ALT
+            - ADSB_EXCHANGE_SITENAME
+
+    adsbexchange-stats:
+        build: ./adsbexchange-stats
+        image: adsbexchange-stats
+        restart: always
+        depends_on:
+            - adsbexchange-feed
+        environment:
+            - ADSB_EXCHANGE_UUID
+        volumes:
+            - adsbexchange-feed:/run/adsbexchange-feed
+        
+    piaware:
+        depends_on: 
+            - readsb
+        build: ./piaware
+        image: piaware
+        restart: always
+        environment: 
+            - FLIGHTAWARE_FEEDER_ID
+            - DUMP978_ENABLED
+            - RECEIVER_HOST=readsb
+            - RECEIVER_PORT=30005
+            - RECEIVER_MLAT_PORT=30104
+        expose:
+            - 8080
+        ports:
+            - 8080:8080
+
+    radarbox:
+        depends_on: 
+            - readsb
+        build: ./radarbox
+        image: radarbox
+        restart: always
+        environment:
+            - RADARBOX_KEY
+            - RADARBOX_USERNAME
+            - LAT
+            - LON
+            - ALT
+        expose:
+            - 32088
+        ports:
+            - 32088:32088
+
+    flightradar:
+        depends_on:
+            - readsb
+        build: ./flightradar
+        image: flightradar
+        restart: always
+        environment:
+            - FLIGHTRADAR_SHARING_KEY
+            - LAT
+            - LON
+            - ALT
+        expose:
+            - 8754
+        ports:
+            - 8754:8754
+
+    opensky:
+        depends_on:
+            - readsb
+        build: ./opensky
+        image: opensky
+        restart: always
+        environment:
+            - LAT
+            - LON
+            - ALT
+            - OPENSKY_SERIAL
+
+    planefinder:
+        depends_on:
+            - readsb
+        build: ./planefinder
+        image: planefinder
+        restart: always
+        environment:
+            - LAT
+            - LON
+            - ALT
+            - PLANEFINDER_SHARECODE
+        expose:
+            - 30053     # web GUI
+            - 30054     # echo port
+        ports:
+            - 30053:30053
+            - 30054:30054

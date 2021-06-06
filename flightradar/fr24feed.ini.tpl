@@ -1,0 +1,8 @@
+receiver="beast-tcp"
+fr24key="${FLIGHTRADAR_SHARING_KEY}"
+host="${RECEIVER_HOST}:${RECEIVER_PORT}"
+bs="no"
+raw="no"
+logmode="1"
+mlat="yes"
+mlat-without-gps="yes"
