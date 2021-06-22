@@ -3,6 +3,7 @@ volumes:
     readsb-config:
     readsb-run:
     adsbexchange-feed:
+    radarbox:
 services:
     readsb:
         build: ./readsb
@@ -106,11 +107,11 @@ services:
         ports:
             - 8080:8080
 
-    radarbox:
+    radarbox-feed:
         depends_on: 
             - readsb
-        build: ./radarbox
-        image: radarbox
+        build: ./radarbox-feed
+        image: radarbox-feed
         restart: always
         environment:
             - RADARBOX_KEY
@@ -122,6 +123,24 @@ services:
             - 32088
         ports:
             - 32088:32088
+        volumes:
+            - radarbox:/etc
+
+    radarbox-mlat:
+        depends_on: 
+            - readsb
+            - radarbox-feed
+        build: ./radarbox-mlat
+        image: radarbox-mlat
+        restart: always
+        environment:
+            - RADARBOX_KEY
+            - RADARBOX_USERNAME
+            - LAT
+            - LON
+            - ALT
+        volumes:
+            - radarbox:/etc
 
     flightradar:
         depends_on:
@@ -168,3 +187,20 @@ services:
         ports:
             - 30053:30053
             - 30054:30054
+
+    # backup:
+    #     image: offen/docker-volume-backup:latest
+    #     restart: always
+    #     environment:
+    #         - BACKUP_CRON_EXPRESSION
+    #         - BACKUP_FILENAME
+    #         - BACKUP_RETENTION_DAYS
+    #         - AWS_ACCESS_KEY_ID
+    #         - AWS_SECRET_ACCESS_KEY
+    #         - AWS_S3_BUCKET_NAME
+    #         - AWS_ENDPOINT
+    #     volumes:
+    #         - radarbox:/backup/radarbox:ro
+    #         - readsb-config:/backup/readsb-config:ro
+    #         - readsb-run:/backup/readsb-run:ro
+    #         - adsbexchange-feed:/backup/adsbexchange-feed:ro
