@@ -29,7 +29,7 @@ FROM base as release
 COPY --from=buildstep /tmp/readsb_*.deb /tmp/
 #COPY --from=buildstep /tmp/readsb/readsb /usr/bin/readsb
 
-COPY --from=buildstep /tmp/readsb/debian/lighttpd* /etc/lighttpd/conf-available
+#COPY --from=buildstep /tmp/readsb/debian/lighttpd* /etc/lighttpd/conf-available
 
 RUN dpkg -i /tmp/readsb_*.deb
 

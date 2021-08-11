@@ -15,11 +15,15 @@ RUN apt-get update && apt-get install -y ${PERM_INSTALL} && apt-get clean && apt
 
 FROM base AS buildstep
 
-ARG TEMP_INSTALL="wget"
+ARG TEMP_INSTALL="wget apt-transport-https ca-certificates gnupg"
 RUN apt-get update && apt-get install -y ${TEMP_INSTALL} && apt-get clean && apt-get autoclean && apt-get autoremove
 
 WORKDIR /tmp
-RUN wget https://opensky-network.org/files/firmware/opensky-feeder_latest_armhf.deb
+RUN wget -O - https://opensky-network.org/files/firmware/opensky.gpg.pub | apt-key add -
+RUN bash -c "echo deb https://opensky-network.org/repos/debian opensky custom > /etc/apt/sources.list.d/opensky.list"
+RUN apt-get update && apt-get download opensky-feeder
+
+#RUN wget https://opensky-network.org/files/firmware/opensky-feeder_latest_armhf.deb
 #RUN dpkg -i opensky-feeder_*.deb
 
 # We can't just install the deb because it prompts for config values, so we extract its contents instead

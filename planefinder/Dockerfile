@@ -20,15 +20,20 @@ RUN apt-get update && apt-get install -y ${TEMP_INSTALL} && apt-get clean && apt
 
 WORKDIR /tmp
 # Cloudflare blocks all attempts to parse this automatically, so we have to manually specify it
-RUN wget http://client.planefinder.net/pfclient_5.0.161_armhf.deb
-RUN dpkg -i pfclient_*.deb
+RUN PF_VERSION=5.0.161 && \
+    wget http://client.planefinder.net/pfclient_${PF_VERSION}_armhf.deb
+#RUN dpkg -i pfclient_*.deb
+RUN dpkg --add-architecture armhf
+RUN dpkg --unpack pfclient_*.deb
 
 FROM base as release
 
 # copy our build deb file from the build layer to the output layer
-COPY --from=buildstep /tmp/pfclient_*.deb /tmp/
+#COPY --from=buildstep /tmp/pfclient_*.deb /tmp/
+COPY --from=buildstep /usr/bin/pfclient /usr/bin/pfclient
 
-RUN dpkg -i /tmp/pfclient_*.deb
+#RUN dpkg --add-architecture armhf
+#RUN dpkg -i /tmp/pfclient_*.deb
 
 COPY start.sh /
 RUN chmod +x /start.sh
