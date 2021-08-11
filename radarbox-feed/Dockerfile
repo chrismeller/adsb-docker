@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y ${PERM_INSTALL} && apt-get clean && apt
 FROM base as release
 
 # Install the key for the RB24 repo
-RUN apt-key adv --keyserver hkp://pgp.mit.edu:80 --recv-keys 1D043681
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 1D043681
 RUN echo 'deb https://apt.rb24.com/ buster main' > /etc/apt/sources.list.d/rb24.list
 
 RUN apt-get update && apt-get install -y rbfeeder && apt-get clean && apt-get autoclean && apt-get autoremove
