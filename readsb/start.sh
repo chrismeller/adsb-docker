@@ -2,7 +2,7 @@
 source /etc/default/readsb
 
 # start lighthttpd and put it in the background
-/usr/sbin/lighthttpd -D -f /etc/lighthttpd/lighthttpd.conf &
+#/usr/sbin/lighthttpd -D -f /etc/lighthttpd/lighthttpd.conf &
 
 # start readsb
 # $RECEIVER_OPTIONS is --gain, for compatability with some scripts like auto-gain
@@ -27,6 +27,7 @@ source /etc/default/readsb
     --raw \
     --json-location-accuracy 2 \
     --write-json /run/readsb \
+    --quiet \
     $RECEIVER_OPTIONS
 
 
