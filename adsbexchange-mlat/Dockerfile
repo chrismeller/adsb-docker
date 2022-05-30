@@ -1,4 +1,4 @@
-FROM debian:buster-slim as base
+FROM debian:10.12-slim as base
 LABEL maintainer="https://github.com/chrismeller"
 
 ENV ADSB_EXCHANGE_SITENAME=
