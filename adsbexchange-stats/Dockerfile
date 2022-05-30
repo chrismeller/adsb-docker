@@ -1,4 +1,4 @@
-FROM debian:buster-slim AS base
+FROM debian:10.12-slim AS base
 LABEL maintainer="https://github.com/chrismeller"
 
 ENV ADSB_EXCHANGE_UUID=
