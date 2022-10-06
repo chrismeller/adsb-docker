@@ -1,4 +1,4 @@
-FROM debian:10.12-slim as base
+FROM debian:buster-20221004-slim as base
 LABEL maintainer="https://github.com/chrismeller"
 
 EXPOSE 30001 30002 30003 30004 30005 30102 30104 30105 30106 8080
